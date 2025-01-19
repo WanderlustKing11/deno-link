@@ -4,38 +4,38 @@
 // So need to make sure that the 2nd param is 'match' or 'params' to correctly connect to 'URLPatternResult', and
 // that _info should be the 3rd parameter in order to connect to 'ServeHandlerInfo'.
 
-import { route, type Route } from "@std/http/unstable-route";
-import { serveDir } from "@std/http/file-server";
+// import { route, type Route } from "@std/http/unstable-route";
+// import { serveDir } from "@std/http/file-server";
 
-const routes: Route[] = [
-  {
-    pattern: new URLPattern({ pathname: "/" }),
-    // Here, we don't need match or info, so we can ignore them:
-    handler: (_req) => new Response("Home page"),
-  },
-  {
-    pattern: new URLPattern({ pathname: "/users/:id" }),
-    //         ↓↓↓ The second param is the URLPatternResult ↓↓↓
-    handler: (_req, params, _info) => new Response(params?.pathname.groups.id),
-  },
-  {
-    pattern: new URLPattern({ pathname: "/static/*" }),
-    // If you want to see match or info, just add them as 2nd and 3rd params
-    handler: (req) => serveDir(req),
-  },
-];
+// const routes: Route[] = [
+//   {
+//     pattern: new URLPattern({ pathname: "/" }),
+//     // Here, we don't need match or info, so we can ignore them:
+//     handler: (_req) => new Response("Home page"),
+//   },
+//   {
+//     pattern: new URLPattern({ pathname: "/users/:id" }),
+//     //         ↓↓↓ The second param is the URLPatternResult ↓↓↓
+//     handler: (_req, params, _info) => new Response(params?.pathname.groups.id),
+//   },
+//   {
+//     pattern: new URLPattern({ pathname: "/static/*" }),
+//     // If you want to see match or info, just add them as 2nd and 3rd params
+//     handler: (req) => serveDir(req),
+//   },
+// ];
 
-function defaultHandler(_req: Request) {
-  return new Response("Not found", { status: 404 });
-}
+// function defaultHandler(_req: Request) {
+//   return new Response("Not found", { status: 404 });
+// }
 
-const handler = route(routes, defaultHandler);
+// const handler = route(routes, defaultHandler);
 
-export default {
-  fetch(req: Request) {
-    return handler(req);
-  },
-} satisfies Deno.ServeDefaultExport;
+// export default {
+//   fetch(req: Request) {
+//     return handler(req);
+//   },
+// } satisfies Deno.ServeDefaultExport;
 
 
 
@@ -117,3 +117,22 @@ export default {
 //   },
 // } satisfies Deno.ServeDefaultExport;
 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////    Custom Router    ////////
+
+import { Router } from "./router.ts";
+const app = new Router();
+
+app.get('/', () => new Response('Hi Mom!'))
+
+app.post('/health-check', () => new Response("It's ALIVE!"))
+
+export default {
+  fetch(req) {
+    return app.handler(req);
+  },
+} satisfies Deno.ServeDefaultExport;
