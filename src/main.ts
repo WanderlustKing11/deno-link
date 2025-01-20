@@ -2,30 +2,43 @@ import { generateShortCode, getShortLink, storeShortLink } from "./db.ts";
 import { Router } from "./router.ts";
 import { render } from "npm:preact-render-to-string";
 import { HomePage } from "./ui.tsx";
+import { createGitHubOAuthConfig, createHelpers } from "jsr:@deno/kv-oauth";
+import { handleGithubCallback } from "./auth.ts";
 
 const app = new Router();
 
 
 ////////    Custom Router    ////////
 
+// OAuth
+const oauthConfig = createGitHubOAuthConfig({
+  redirectUri: Deno.env.get("REDIRECT_URI"),
+});
+const {
+  signIn,
+  signOut,
+} = createHelpers(oauthConfig);
+
+app.get("/oauth/signin", (req: Request) => signIn(req));
+app.get("/oauth/signout", signOut);
+app.get("/oauth/callback", handleGithubCallback);
+
+// Home Page
 app.get("/", () => {
   return new Response(
-    render(HomePage({user: null })), 
+    render(HomePage({ user: app.currentUser })),
     {
-    status: 200,
-    headers: {
-      "content-type": "text/html",
+      status: 200,
+      headers: {
+        "content-type": "text/html",
+      },
     },
-  });
+  );
 });
 
-// app.post('/health-check', () => new Response("It's ALIVE!"))
 
-export default {
-  fetch(req) {
-    return app.handler(req);
-  },
-} satisfies Deno.ServeDefaultExport;
+
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +88,11 @@ app.get("/links/:id", async (_req, params, _info) => {
 })
 
 
+export default {
+  fetch(req) {
+    return app.handler(req);
+  },
+} satisfies Deno.ServeDefaultExport;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
