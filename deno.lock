@@ -14,7 +14,9 @@
     "jsr:@std/media-types@^1.1.0": "1.1.0",
     "jsr:@std/net@^1.0.4": "1.0.4",
     "jsr:@std/path@^1.0.8": "1.0.8",
-    "jsr:@std/streams@^1.0.8": "1.0.8"
+    "jsr:@std/streams@^1.0.8": "1.0.8",
+    "npm:preact-render-to-string@*": "6.5.13_preact@10.25.4",
+    "npm:preact@*": "10.25.4"
   },
   "jsr": {
     "@std/assert@1.0.10": {
@@ -70,6 +72,20 @@
       "integrity": "b41332d93d2cf6a82fe4ac2153b930adf1a859392931e2a19d9fabfb6f154fb3"
     }
   },
+  "npm": {
+    "preact-render-to-string@6.5.13_preact@10.25.4": {
+      "integrity": "sha512-iGPd+hKPMFKsfpR2vL4kJ6ZPcFIoWZEcBf0Dpm3zOpdVvj77aY8RlLiQji5OMrngEyaxGogeakTb54uS2FvA6w==",
+      "dependencies": [
+        "preact"
+      ]
+    },
+    "preact@10.25.4": {
+      "integrity": "sha512-jLdZDb+Q+odkHJ+MpW/9U5cODzqnB+fy2EiHSZES7ldV5LK7yjlVzTp7R8Xy6W6y75kfK8iWYtFVH7lvjwrCMA=="
+    }
+  },
+  "redirects": {
+    "https://esm.sh/preact/jsx-runtime": "https://esm.sh/preact@10.25.4/jsx-runtime"
+  },
   "remote": {
     "https://deno.land/std@0.198.0/assert/assert.ts": "9a97dad6d98c238938e7540736b826440ad8c1c1e54430ca4c4e623e585607ee",
     "https://deno.land/std@0.198.0/assert/assertion_error.ts": "4d0bde9b374dfbcbe8ac23f54f567b77024fb67dbb1906a852d67fe050d42f56",
@@ -84,12 +100,16 @@
     "https://deno.land/std@0.198.0/async/retry.ts": "296fb9c323e1325a69bee14ba947e7da7409a8dd9dd646d70cb51ea0d301f24e",
     "https://deno.land/std@0.198.0/async/tee.ts": "47e42d35f622650b02234d43803d0383a89eb4387e1b83b5a40106d18ae36757",
     "https://deno.land/std@0.198.0/http/server.ts": "3cd5a8acc31d3259813ddcfa7dd2fe066952db6763fc7a58b9a026d4b5af9559",
-    "https://deno.land/x/routeno@0.1.0/router.ts?code=&s=createRouter": "c5bd30ce3ce12d2b36806e969d6b35e5bdf694ca35525e0805c99b7b21d8b33b"
+    "https://deno.land/x/routeno@0.1.0/router.ts?code=&s=createRouter": "c5bd30ce3ce12d2b36806e969d6b35e5bdf694ca35525e0805c99b7b21d8b33b",
+    "https://esm.sh/preact@10.25.4/denonext/jsx-runtime.mjs": "28db928810c77a6aa3a8690826a773d6bb08bea2bb5a2d9935b7b0a32808449e",
+    "https://esm.sh/preact@10.25.4/denonext/preact.mjs": "5b19c5a3daab9e9f4f4bed775afbb84dd4de2b8cc670ee332f5458c53a6a2d45",
+    "https://esm.sh/preact@10.25.4/jsx-runtime": "b9feb114168d102397dc3d6b09e00630b9ef61c4fa98316c0b18b4c02996356b"
   },
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
-      "jsr:@std/http@1"
+      "jsr:@std/http@1",
+      "npm:preact@*"
     ]
   }
 }

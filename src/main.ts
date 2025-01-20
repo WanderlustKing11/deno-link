@@ -1,20 +1,48 @@
 import { generateShortCode, getShortLink, storeShortLink } from "./db.ts";
 import { Router } from "./router.ts";
+import { render } from "npm:preact-render-to-string";
+import { HomePage } from "./ui.tsx";
+
+const app = new Router();
 
 
 ////////    Custom Router    ////////
 
-const app = new Router();
+app.get("/", () => {
+  return new Response(
+    render(HomePage({user: null })), 
+    {
+    status: 200,
+    headers: {
+      "content-type": "text/html",
+    },
+  });
+});
 
-app.get('/', () => new Response('Hi Mom!'))
-
-app.post('/health-check', () => new Response("It's ALIVE!"))
+// app.post('/health-check', () => new Response("It's ALIVE!"))
 
 export default {
   fetch(req) {
     return app.handler(req);
   },
 } satisfies Deno.ServeDefaultExport;
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+///// Home Page Route //////
+
+
+// app.get("/", () => {
+//   return new Response(
+//     render(HomePage({user: null })), 
+//     {
+//     status: 200,
+//     headers: {
+//       "content-type": "text/html",
+//     },
+//   });
+// });
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
