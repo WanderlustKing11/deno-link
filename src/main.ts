@@ -1,4 +1,59 @@
-// Simple solution for Deno HTTP (observing param argument order)
+import { generateShortCode, getShortLink, storeShortLink } from "./db.ts";
+import { Router } from "./router.ts";
+
+
+////////    Custom Router    ////////
+
+const app = new Router();
+
+app.get('/', () => new Response('Hi Mom!'))
+
+app.post('/health-check', () => new Response("It's ALIVE!"))
+
+export default {
+  fetch(req) {
+    return app.handler(req);
+  },
+} satisfies Deno.ServeDefaultExport;
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+///// JSON API to write and retreive data from the database
+
+
+app.post("/links", async (req) => {
+  const { longUrl } = await req.json()
+
+  const shortCode = await generateShortCode(longUrl);
+  await storeShortLink(longUrl, shortCode, 'testUser');
+
+  return new Response("success!", {
+    status: 201,
+  });
+});
+
+app.get("/links/:id", async (_req, params, _info) => {
+  const shortCode = params?.pathname.groups.id;
+
+  const data = await getShortLink(shortCode!)
+
+  return new Response(JSON.stringify(data), {
+    status: 201,
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+})
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// Simple solution for how to use Deno HTTP (observing param argument order)
 // Inside @std/http/unstable-route, the handler callback for each route is typed as (by default):
 // (req: Request, match: URLPatternResult | undefined, info: Deno.ServeHandlerInfo) => Response | Promise<Response>
 // So need to make sure that the 2nd param is 'match' or 'params' to correctly connect to 'URLPatternResult', and
@@ -119,20 +174,5 @@
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////
 
 
-////////    Custom Router    ////////
-
-import { Router } from "./router.ts";
-const app = new Router();
-
-app.get('/', () => new Response('Hi Mom!'))
-
-app.post('/health-check', () => new Response("It's ALIVE!"))
-
-export default {
-  fetch(req) {
-    return app.handler(req);
-  },
-} satisfies Deno.ServeDefaultExport;
