@@ -1,7 +1,7 @@
-import { generateShortCode, getShortLink, storeShortLink } from "./db.ts";
+import { generateShortCode, getShortLink, storeShortLink, getUserLinks } from "./db.ts";
 import { Router } from "./router.ts";
 import { render } from "npm:preact-render-to-string";
-import { HomePage } from "./ui.tsx";
+import { CreateShortlinkPage, HomePage, LinksPage, UnauthorizedPage } from "./ui.tsx";
 import { createGitHubOAuthConfig, createHelpers } from "jsr:@deno/kv-oauth";
 import { handleGithubCallback } from "./auth.ts";
 
@@ -23,6 +23,16 @@ app.get("/oauth/signin", (req: Request) => signIn(req));
 app.get("/oauth/signout", signOut);
 app.get("/oauth/callback", handleGithubCallback);
 
+function unauthorizedResponse() {
+  return new Response(render(UnauthorizedPage()), {
+    status: 401,
+    headers: {
+      "content-type": "text/html",
+    },
+  });
+}
+
+
 // Home Page
 app.get("/", () => {
   return new Response(
@@ -35,9 +45,6 @@ app.get("/", () => {
     },
   );
 });
-
-
-
 
 
 
@@ -219,6 +226,54 @@ export default {
 // } satisfies Deno.ServeDefaultExport;
 
 
+//////////////////////////////////////////////////////////////////////////////////////
+
+////////  Form Submission  /////////
+
+app.get("/links/new", (_req) => {
+  if (!app.currentUser) return unauthorizedResponse();
+
+  return new Response(render(CreateShortlinkPage()), {
+    status: 200,
+    headers: {
+      "content-type": "text/html",
+    },
+  });
+});
 
 
+app.post("/links", async (req) => {
+  if (!app.currentUser) return unauthorizedResponse();
 
+  // Parse form data
+  const formData = await req.formData();
+  const longUrl = formData.get("longUrl") as string;
+
+  if (!longUrl) {
+    return new Response("Missing longUrl", { status: 400 });
+  }
+
+  const shortCode = await generateShortCode(longUrl);
+  await storeShortLink(longUrl, shortCode, app.currentUser.login);
+
+  // Redirect to the links list page after successful creation
+  return new Response(null, {
+    status: 303,
+    headers: {
+      "Location": "/links",
+    },
+  });
+});
+
+app.get("/links", async () => {
+  if (!app.currentUser) return unauthorizedResponse();
+
+  const shortLinks = await getUserLinks(app.currentUser.login);
+
+  return new Response(render(LinksPage({ shortLinkList: shortLinks })), {
+    status: 200,
+    headers: {
+      "content-type": "text/html",
+    },
+  });
+});
